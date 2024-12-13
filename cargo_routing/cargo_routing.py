@@ -1,9 +1,8 @@
 # node structure for each city
 class Node:
-    def __init__(self,city_name,city_id,delivery_time=0):
+    def __init__(self,city_name,city_id):
         self.city_name = city_name
         self.city_id = city_id
-        self.delivery_time = delivery_time
         self.children = []
 
     def add_child(self,child_node):
@@ -26,13 +25,28 @@ class DeliveryTree:
                 return result
         return None
 
-    def calculate_delivery_time(self,city_id,node=None):
+    def calculate_total_delivery_time(self, node=None, current_depth=0):
         if node is None:
             node = self.root
 
-        total_time = node.delivery_time
+        total_time = current_depth
         for child in node.children:
-            total_time += self.calculate_delivery_time(city_id,child)
+            total_time += self.calculate_total_delivery_time(child, current_depth + 1)
+
         return total_time
 
+    def display_tree(self,node=None,level =0):
+        if node is None:
+            node = self.root
+        print(" " * level * 4 + f"{node.city_name} (ID: {node.city_id})")
+        for child in node.children:
+            self.display_tree(child, level + 1)
+
+    def add_city(self, parent_id, city_name, city_id):
+        parent_node = self.find_city(parent_id)
+        if not parent_node:
+            raise ValueError(f"Parent city with ID {parent_id} not found.")
+
+        new_city = Node(city_name, city_id)
+        parent_node.add_child(new_city)
 
