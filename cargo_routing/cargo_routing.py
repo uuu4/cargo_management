@@ -25,15 +25,19 @@ class DeliveryTree:
                 return result
         return None
 
-    def calculate_total_delivery_time(self, node=None, current_depth=0):
+    def calculate_paths(self, node=None, current_depth=0, current_path=[], all_paths=[]):
         if node is None:
             node = self.root
 
-        total_time = current_depth
-        for child in node.children:
-            total_time += self.calculate_total_delivery_time(child, current_depth + 1)
+        current_path.append((node, current_depth))
 
-        return total_time
+        if not node.children: # if node has no children then save it to all_paths
+            all_paths.append((current_path, current_path[-1][1]))  # path, depth
+        else:
+            for child in node.children:
+                self.calculate_paths(child, current_depth + 1, current_path[:], all_paths)
+
+        return all_paths
 
     def display_tree(self,node=None,level =0):
         if node is None:
