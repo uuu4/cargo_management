@@ -1,85 +1,84 @@
 import sys
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout,
-    QLabel, QLineEdit, QPushButton, QTextEdit, QHBoxLayout, QMessageBox
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QLineEdit, QPushButton, QTreeWidget, QTreeWidgetItem, QMessageBox
 )
 from cargo_system import CargoSystem
 
 
-class CargoSystemGUI(QMainWindow):
+class CargoSystemTreeGUI(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.cargo_system = CargoSystem()
-        self.setWindowTitle("Cargo Tracking System")
-        self.setGeometry(300, 100, 600, 500)
+        self.setWindowTitle("Cargo Tracking System with Tree View")
+        self.setGeometry(300, 100, 800, 600)
 
+        # Ana widget ve layout
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-
-        # Layouts
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
 
-        # Add Customer Section
-        self.add_customer_layout = QHBoxLayout()
-        self.layout.addLayout(self.add_customer_layout)
-
+        # Müşteri ekleme
+        self.customer_layout = QHBoxLayout()
         self.customer_name_input = QLineEdit()
-        self.customer_name_input.setPlaceholderText("Enter Customer Name")
+        self.customer_name_input.setPlaceholderText("Müşteri Adı")
         self.customer_id_input = QLineEdit()
-        self.customer_id_input.setPlaceholderText("Enter Customer ID")
-        self.add_customer_button = QPushButton("Add Customer")
+        self.customer_id_input.setPlaceholderText("Müşteri ID")
+        self.add_customer_button = QPushButton("Müşteri Ekle")
         self.add_customer_button.clicked.connect(self.add_customer)
 
-        self.add_customer_layout.addWidget(QLabel("Add Customer: "))
-        self.add_customer_layout.addWidget(self.customer_name_input)
-        self.add_customer_layout.addWidget(self.customer_id_input)
-        self.add_customer_layout.addWidget(self.add_customer_button)
+        self.customer_layout.addWidget(QLabel("Müşteri Ekle:"))
+        self.customer_layout.addWidget(self.customer_name_input)
+        self.customer_layout.addWidget(self.customer_id_input)
+        self.customer_layout.addWidget(self.add_customer_button)
+        self.layout.addLayout(self.customer_layout)
 
-        # Add Shipment Section
-        self.add_shipment_layout = QHBoxLayout()
-        self.layout.addLayout(self.add_shipment_layout)
-
+        # Gönderi ekleme
+        self.shipment_layout = QHBoxLayout()
         self.shipment_customer_id_input = QLineEdit()
-        self.shipment_customer_id_input.setPlaceholderText("Customer ID")
+        self.shipment_customer_id_input.setPlaceholderText("Müşteri ID")
         self.shipment_id_input = QLineEdit()
-        self.shipment_id_input.setPlaceholderText("Shipment ID")
+        self.shipment_id_input.setPlaceholderText("Gönderi ID")
         self.shipment_date_input = QLineEdit()
-        self.shipment_date_input.setPlaceholderText("Date (YYYY-MM-DD)")
+        self.shipment_date_input.setPlaceholderText("Tarih (YYYY-MM-DD)")
         self.shipment_delivery_input = QLineEdit()
-        self.shipment_delivery_input.setPlaceholderText("Delivery Time (days)")
+        self.shipment_delivery_input.setPlaceholderText("Teslim Süresi (gün)")
         self.shipment_status_input = QLineEdit()
-        self.shipment_status_input.setPlaceholderText("Status")
-        self.add_shipment_button = QPushButton("Add Shipment")
+        self.shipment_status_input.setPlaceholderText("Durum")
+        self.add_shipment_button = QPushButton("Gönderi Ekle")
         self.add_shipment_button.clicked.connect(self.add_shipment)
 
-        self.add_shipment_layout.addWidget(QLabel("Add Shipment: "))
-        self.add_shipment_layout.addWidget(self.shipment_customer_id_input)
-        self.add_shipment_layout.addWidget(self.shipment_id_input)
-        self.add_shipment_layout.addWidget(self.shipment_date_input)
-        self.add_shipment_layout.addWidget(self.shipment_delivery_input)
-        self.add_shipment_layout.addWidget(self.shipment_status_input)
-        self.add_shipment_layout.addWidget(self.add_shipment_button)
+        self.shipment_layout.addWidget(QLabel("Gönderi Ekle:"))
+        self.shipment_layout.addWidget(self.shipment_customer_id_input)
+        self.shipment_layout.addWidget(self.shipment_id_input)
+        self.shipment_layout.addWidget(self.shipment_date_input)
+        self.shipment_layout.addWidget(self.shipment_delivery_input)
+        self.shipment_layout.addWidget(self.shipment_status_input)
+        self.shipment_layout.addWidget(self.add_shipment_button)
+        self.layout.addLayout(self.shipment_layout)
 
-        # Display Shipments Section
-        self.shipments_display = QTextEdit()
-        self.shipments_display.setReadOnly(True)
-        self.layout.addWidget(QLabel("All Shipments:"))
-        self.layout.addWidget(self.shipments_display)
+        # Ağaç görünümü
+        self.tree_widget = QTreeWidget()
+        self.tree_widget.setHeaderLabels(["Müşteri/Gönderi Bilgisi", "Detaylar"])
+        self.layout.addWidget(QLabel("Müşteri ve Gönderi Ağaç Görünümü:"))
+        self.layout.addWidget(self.tree_widget)
 
-        self.display_button = QPushButton("Refresh Shipments")
-        self.display_button.clicked.connect(self.display_shipments)
-        self.layout.addWidget(self.display_button)
+        # Refresh Button
+        self.refresh_button = QPushButton("Yenile")
+        self.refresh_button.clicked.connect(self.update_tree)
+        self.layout.addWidget(self.refresh_button)
 
     def add_customer(self):
         name = self.customer_name_input.text()
         customer_id = self.customer_id_input.text()
         if name and customer_id:
             message = self.cargo_system.add_customer(customer_id, name)
-            QMessageBox.information(self, "Info", message)
+            QMessageBox.information(self, "Bilgi", message)
+            self.update_tree()
         else:
-            QMessageBox.warning(self, "Warning", "Enter both Customer Name and ID")
+            QMessageBox.warning(self, "Uyarı", "Lütfen müşteri adı ve ID girin.")
 
     def add_shipment(self):
         customer_id = self.shipment_customer_id_input.text()
@@ -90,24 +89,34 @@ class CargoSystemGUI(QMainWindow):
 
         if all([customer_id, shipment_id, date, delivery_time, status]):
             try:
-                message = self.cargo_system.add_shipment(customer_id, shipment_id, date, int(delivery_time), status)
-                QMessageBox.information(self, "Info", message)
+                message = self.cargo_system.add_shipment(
+                    customer_id, shipment_id, date, int(delivery_time), status
+                )
+                QMessageBox.information(self, "Bilgi", message)
+                self.update_tree()
             except ValueError:
-                QMessageBox.warning(self, "Warning", "Invalid delivery time format.")
+                QMessageBox.warning(self, "Uyarı", "Geçerli bir teslim süresi girin.")
         else:
-            QMessageBox.warning(self, "Warning", "Please fill all fields.")
+            QMessageBox.warning(self, "Uyarı", "Lütfen tüm alanları doldurun.")
 
-    def display_shipments(self):
-        self.shipments_display.clear()
-        for customer in self.cargo_system.get_all_customers().values():
-            self.shipments_display.append(f"Customer: {customer.name} (ID: {customer.customer_id})")
+    def update_tree(self):
+        self.tree_widget.clear()
+        customers = self.cargo_system.get_all_customers()
+        for customer in customers.values():
+            customer_item = QTreeWidgetItem([f"{customer.name} (ID: {customer.customer_id})", ""])
+            self.tree_widget.addTopLevelItem(customer_item)
             for shipment in customer.get_shipments():
-                self.shipments_display.append(str(shipment))
-            self.shipments_display.append("")
+                shipment_item = QTreeWidgetItem([
+                    f"Gönderi ID: {shipment.shipment_id}",
+                    f"Tarih: {shipment.date.date()}, Teslim: {shipment.delivery_time} gün, Durum: {shipment.status}"
+                ])
+                customer_item.addChild(shipment_item)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = CargoSystemGUI()
+    window = CargoSystemTreeGUI()
     window.show()
     sys.exit(app.exec())
+
+####
