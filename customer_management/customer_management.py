@@ -18,12 +18,19 @@ class Customer:
 
     def add_cargo(self, cargo):
         self.cargo_history.append(cargo)
-        self.cargo_history.sort(key=lambda x: x.send_date)  # Tarih sırasına göre sıralama
+        self.cargo_history = self.sort_by_date(self.cargo_history)  # Tarih sırasına göre sıralama
 
         # Yeni gönderimi yığına ekle (son 5 gönderim tutulur)
         self.cargo_stack.append(cargo)
         if len(self.cargo_stack) > 5:
             self.cargo_stack.pop(0)
+
+    def sort_by_date(self, cargos):
+        for i in range(len(cargos)):
+            for j in range(0, len(cargos) - i - 1):
+                if cargos[j].send_date > cargos[j + 1].send_date:
+                    cargos[j], cargos[j + 1] = cargos[j + 1], cargos[j]
+        return cargos
 
     def display_last_5_cargos(self):
         if not self.cargo_stack:
@@ -34,10 +41,9 @@ class Customer:
                 print(cargo)
 
     def search_delivered_cargo(self, cargo_id):
-        delivered_cargos = sorted(
-            [cargo for cargo in self.cargo_history if cargo.delivery_status == "Teslim Edildi"],
-            key=lambda x: x.cargo_id
-        )
+        delivered_cargos = [cargo for cargo in self.cargo_history if cargo.delivery_status == "Teslim Edildi"]
+        delivered_cargos = self.sort_by_id(delivered_cargos)  # Kargo ID'ye göre sıralama
+
         # Binary Search
         left, right = 0, len(delivered_cargos) - 1
         while left <= right:
@@ -50,6 +56,13 @@ class Customer:
                 right = mid - 1
         return None
 
+    def sort_by_id(self, cargos):
+        for i in range(len(cargos)):
+            for j in range(0, len(cargos) - i - 1):
+                if cargos[j].cargo_id > cargos[j + 1].cargo_id:
+                    cargos[j], cargos[j + 1] = cargos[j + 1], cargos[j]
+        return cargos
+
     def sort_undelivered_cargos(self):
         undelivered_cargos = [cargo for cargo in self.cargo_history if cargo.delivery_status == "Teslim Edilmedi"]
 
@@ -57,12 +70,11 @@ class Customer:
             if len(array) <= 1:
                 return array
             pivot = array[0]
-            less = [x for x in array[1:] if x.delivery_time <= pivot.delivery_time]
-            greater = [x for x in array[1:] if x.delivery_time > pivot.delivery_time]
+            less = [cargo for cargo in array[1:] if cargo.delivery_time <= pivot.delivery_time]
+            greater = [cargo for cargo in array[1:] if cargo.delivery_time > pivot.delivery_time]
             return quick_sort(less) + [pivot] + quick_sort(greater)
 
-        sorted_cargos = quick_sort(undelivered_cargos)
-        return sorted_cargos
+        return quick_sort(undelivered_cargos)
 
     def display_cargo_history(self):
         if not self.cargo_history:
