@@ -16,6 +16,8 @@ class Customer:
         self.cargo_history = []  # Gönderim Geçmişi (Liste olarak)
         self.cargo_stack = []  # Yığın (Stack) için liste
 
+
+
     def add_cargo(self, cargo):
         self.cargo_history.append(cargo)
         self.cargo_history = self.sort_by_date(self.cargo_history)  # Tarih sırasına göre sıralama
