@@ -1,5 +1,6 @@
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QDialog, QGraphicsView, QGraphicsScene, QGraphicsRectItem
+from PySide6.QtWidgets import QApplication,QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QDialog, QGraphicsView, QGraphicsScene, QGraphicsRectItem
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontDatabase,QFont
 
 # Müşteri Listesi
 customer_list = []
@@ -9,15 +10,18 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Online Kargo Takip Sistemi')
-        self.setGeometry(100, 100, 400, 350)
+        self.setGeometry(600, 200, 500, 450)
 
         # Ana Layout
         layout = QVBoxLayout()
 
         # Başlık
+        font = QFont("Times New Roman", 36)  # Times New Roman yazı tipi, 36 px boyutunda
+        font.setItalic(True)  # Yazıyı italik yapar
         label = QLabel("Ana Menü", self)
+        label.setFont(font)
         label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("font-size: 24px; font-weight: bold; color: #4CAF50;")
+        label.setStyleSheet("font-size: 70px; font-weight: bold; color: gray;")
         layout.addWidget(label)
 
         # Butonlar
