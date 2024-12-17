@@ -1,12 +1,18 @@
 class Cargo:
     def __init__(self, cargo_id, send_date, delivery_status, delivery_time):
-        self.cargo_id = cargo_id  # Gönderi ID
-        self.send_date = send_date  # Gönderi Tarihi
-        self.delivery_status = delivery_status  # Teslim Durumu ("Teslim Edildi", "Teslim Edilmedi")
-        self.delivery_time = delivery_time  # Teslim Süresi (gün)
+        self.cargo_id = cargo_id
+        self.send_date = send_date
+        self.delivery_status = delivery_status
+        self.delivery_time = delivery_time
+
+
+    def __lt__(self, other):
+        # Teslimat süresine göre karşılaştırma
+        return self.delivery_time < other.delivery_time
 
     def __repr__(self):
-        return f"[ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün]"
+        return f"ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün"
+
 
 class Customer:
     def __init__(self, customer_id, first_name, last_name):
@@ -85,6 +91,10 @@ class Customer:
             print(f"{self.first_name} {self.last_name} için gönderim geçmişi:")
             for cargo in self.cargo_history:
                 print(cargo)
+        if self.cargo_history:
+            return "\n".join([str(cargo) for cargo in self.cargo_history])
+        return "Kargo geçmişi bulunamadı."
+
 
     def __repr__(self):
         return f"[ID: {self.customer_id}, Ad: {self.first_name}, Soyad: {self.last_name}]"
