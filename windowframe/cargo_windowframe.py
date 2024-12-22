@@ -1,7 +1,8 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QLineEdit, QLabel, QTableWidget, QTableWidgetItem, QWidget, QTreeWidget, QTreeWidgetItem
 from PySide6.QtWidgets import QListWidget
-
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt
 # Backend modüllerini import ediyoruz
 from customer_management import CustomerManagement, Cargo
 from cargo_prioritization import PriorityQueue
@@ -11,40 +12,156 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Kargo Yönetim Sistemi")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 900, 650)
 
         # Backend sınıfları
         self.customer_management = CustomerManagement()
         self.priority_queue = PriorityQueue()
+        # ana layout
 
         layout = QVBoxLayout()
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(layout)
 
+        # Başlık
+        title_label = QLabel("Kargo Yönetim Sistemi")
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setFont(QFont("Arial", 28, QFont.Bold))
+        title_label.setStyleSheet("color: #ffffff; padding: 10px; background-color: #444444;")
+        layout.addWidget(title_label)
+        # arkaplan stili
+        self.setStyleSheet("""
+                    QMainWindow {
+                        background-color: #2c2c2c;
+                    }
+                """)
         # Butonlar
         add_customer_btn = QPushButton("Yeni Müşteri Ekle", self)
         add_customer_btn.clicked.connect(self.open_add_customer_dialog)
+        add_customer_btn.setFont(QFont("Arial",14))
+        add_customer_btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                        }
+                        QPushButton:hover {
+                           background-color: #9455f4;
+                        }
+                        QPushButton:pressed {
+                            background-color: #444444;
+                        }
+                    """)
         layout.addWidget(add_customer_btn)
 
         add_cargo_btn = QPushButton("Kargo Ekle", self)
         add_cargo_btn.clicked.connect(self.open_add_cargo_dialog)
+        add_cargo_btn.setFont(QFont("Arial", 14))
+        add_cargo_btn.setStyleSheet("""
+                                QPushButton {
+                                    background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                                }
+                                QPushButton:hover {
+                                    background-color: #9455f4;
+                                }
+                                QPushButton:pressed {
+                                    background-color: #444444;
+                                }
+                            """)
         layout.addWidget(add_cargo_btn)
 
         search_cargo_btn = QPushButton("Kargo Durumu Sorgula", self)
         search_cargo_btn.clicked.connect(self.open_search_cargo_dialog)
+        search_cargo_btn.setFont(QFont("Arial", 14))
+        search_cargo_btn.setStyleSheet("""
+                                        QPushButton {
+                                            background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                                        }
+                                        QPushButton:hover {
+                                             background-color: #9455f4;
+                                        }
+                                        QPushButton:pressed {
+                                            background-color: #444444;
+                                        }
+                                    """)
         layout.addWidget(search_cargo_btn)
 
         view_history_btn = QPushButton("Gönderim Geçmişini Görüntüle", self)
         view_history_btn.clicked.connect(self.open_view_history_dialog)
+        view_history_btn.setFont(QFont("Arial", 14))
+        view_history_btn.setStyleSheet("""
+                                                QPushButton {
+                                                    background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                                                }
+                                                QPushButton:hover {
+                                                     background-color: #9455f4;
+                                                }
+                                                QPushButton:pressed {
+                                                    background-color: #444444;
+                                                }
+                                            """)
         layout.addWidget(view_history_btn)
 
         list_all_cargos_btn = QPushButton("Tüm Kargoları Listele", self)
         list_all_cargos_btn.clicked.connect(self.open_list_all_cargos_dialog)
+        list_all_cargos_btn.setFont(QFont("Arial", 14))
+        list_all_cargos_btn.setStyleSheet("""
+                                                        QPushButton {
+                                                            background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                                                        }
+                                                        QPushButton:hover {
+                                                            background-color: #9455f4;
+                                                        }
+                                                        QPushButton:pressed {
+                                                            background-color: #444444;
+                                                        }
+                                                    """)
         layout.addWidget(list_all_cargos_btn)
 
         show_routes_btn = QPushButton("Teslimat Rotalarını Göster", self)
         show_routes_btn.clicked.connect(self.open_show_routes_dialog)
+        show_routes_btn.setFont(QFont("Arial", 14))
+        show_routes_btn.setStyleSheet("""
+                                                                QPushButton {
+                                                                    background-color: #593392;
+                                                            color: #FFFFFF;
+                                                            border: 2px solid #9455f4;
+                                                            border-radius: 10px;
+                                                            padding: 10px;
+                                                            margin: 8px;
+                                                                }
+                                                                QPushButton:hover {
+                                                                     background-color: #9455f4;
+                                                                }
+                                                                QPushButton:pressed {
+                                                                    background-color: #444444;
+                                                                }
+                                                            """)
+
         layout.addWidget(show_routes_btn)
 
     # Seçenekler için dialogları açıyoruz
