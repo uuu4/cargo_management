@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Kargo Yönetim Sistemi")
-        self.setGeometry(100, 100, 900, 650)
+        self.setGeometry(100, 120, 900, 650)
 
         # Backend sınıfları
         self.customer_management = CustomerManagement()
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
         add_customer_btn.setFont(QFont("Arial", 14))
         add_customer_btn.setStyleSheet("""
                         QPushButton {
-                            background-color: #593392;
+                            background-color: #gray;
                             color: #FFFFFF;
                             border: 2px solid #9455f4;
                             border-radius: 10px;
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         add_cargo_btn.setFont(QFont("Arial", 14))
         add_cargo_btn.setStyleSheet("""
                                 QPushButton {
-                                    background-color: #593392;
+                                    background-color: #gray;
                                                             color: #FFFFFF;
                                                             border: 2px solid #9455f4;
                                                             border-radius: 10px;
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
         search_cargo_btn.setFont(QFont("Arial", 14))
         search_cargo_btn.setStyleSheet("""
                                         QPushButton {
-                                            background-color: #593392;
+                                            background-color: #gray;
                                                             color: #FFFFFF;
                                                             border: 2px solid #9455f4;
                                                             border-radius: 10px;
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         view_history_btn.setFont(QFont("Arial", 14))
         view_history_btn.setStyleSheet("""
                                                 QPushButton {
-                                                    background-color: #593392;
+                                                    background-color: #gray;
                                                             color: #FFFFFF;
                                                             border: 2px solid #9455f4;
                                                             border-radius: 10px;
@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
         list_all_cargos_btn.setFont(QFont("Arial", 14))
         list_all_cargos_btn.setStyleSheet("""
                                                         QPushButton {
-                                                            background-color: #593392;
+                                                            background-color: #gray;
                                                             color: #FFFFFF;
                                                             border: 2px solid #9455f4;
                                                             border-radius: 10px;
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
         show_routes_btn.setFont(QFont("Arial", 14))
         show_routes_btn.setStyleSheet("""
                                                                 QPushButton {
-                                                                    background-color: #593392;
+                                                                    background-color: #gray;
                                                             color: #FFFFFF;
                                                             border: 2px solid #9455f4;
                                                             border-radius: 10px;
