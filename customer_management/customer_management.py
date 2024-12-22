@@ -1,18 +1,19 @@
 class Cargo:
-    def __init__(self, cargo_id, send_date, delivery_status, delivery_time):
+    def __init__(self, cargo_id, send_date, delivery_status, delivery_time, source, destination):
         self.cargo_id = cargo_id
         self.send_date = send_date
         self.delivery_status = delivery_status
         self.delivery_time = delivery_time
+        self.source = source
+        self.destination = destination
+
+    def __repr__(self):
+        return f"ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün, Nereden: {self.source}, Nereye: {self.destination}"
 
 
     def __lt__(self, other):
         # Teslimat süresine göre karşılaştırma
         return self.delivery_time < other.delivery_time
-
-    def __repr__(self):
-        return f"ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün"
-
 
 class Customer:
     def __init__(self, customer_id, first_name, last_name):
@@ -22,6 +23,11 @@ class Customer:
         self.cargo_history = []  # Gönderim Geçmişi (Liste olarak)
         self.cargo_stack = []  # Yığın (Stack) için liste
 
+    def search_cargo(self, cargo_id):
+        for cargo in self.cargo_history:  # Tüm kargo geçmişini kontrol et
+            if cargo.cargo_id == cargo_id:
+                return cargo
+        return None
 
 
     def add_cargo(self, cargo):

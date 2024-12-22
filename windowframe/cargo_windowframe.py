@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QLineEdit, QLabel, QTableWidget, QTableWidgetItem, QWidget, QTreeWidget, QTreeWidgetItem
-from PySide6.QtWidgets import QListWidget
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QListWidget,QComboBox
+from PySide6.QtGui import QFont,QPixmap, QPainter
 from PySide6.QtCore import Qt
 # Backend modüllerini import ediyoruz
 from customer_management import CustomerManagement, Cargo
@@ -17,9 +17,19 @@ class MainWindow(QMainWindow):
         # Backend sınıfları
         self.customer_management = CustomerManagement()
         self.priority_queue = PriorityQueue()
-        # ana layout
 
+        # Ana layout
         layout = QVBoxLayout()
+
+        # Arka Plan Resmi
+        self.background_label = QLabel(self)
+        pixmap = QPixmap(r"C:\Users\Emir Başak Sunar\Documents\GitHub\cargo_management\windowframe\kargo.png")
+        self.background_label.setPixmap(pixmap)
+        self.background_label.setGeometry(0, 0, self.width(), self.height())  # Resmin boyutlarını pencereye göre ayarla
+        self.background_label.setAlignment(Qt.AlignCenter)
+        self.background_label.setScaledContents(True)
+
+        # Ana Widget (tüm içerik)
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(layout)
@@ -28,26 +38,21 @@ class MainWindow(QMainWindow):
         title_label = QLabel("Kargo Yönetim Sistemi")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setFont(QFont("Arial", 28, QFont.Bold))
-        title_label.setStyleSheet("color: #ffffff; padding: 10px; background-color: #444444;")
+        title_label.setStyleSheet("color: #aaaaaa; padding: 10px; background-color: #transparent;")
         layout.addWidget(title_label)
-        # arkaplan stili
-        self.setStyleSheet("""
-                    QMainWindow {
-                        background-color: #2c2c2c;
-                    }
-                """)
+
         # Butonlar
         add_customer_btn = QPushButton("Yeni Müşteri Ekle", self)
         add_customer_btn.clicked.connect(self.open_add_customer_dialog)
-        add_customer_btn.setFont(QFont("Arial",14))
+        add_customer_btn.setFont(QFont("Arial", 14))
         add_customer_btn.setStyleSheet("""
                         QPushButton {
                             background-color: #593392;
-                                                            color: #FFFFFF;
-                                                            border: 2px solid #9455f4;
-                                                            border-radius: 10px;
-                                                            padding: 10px;
-                                                            margin: 8px;
+                            color: #FFFFFF;
+                            border: 2px solid #9455f4;
+                            border-radius: 10px;
+                            padding: 10px;
+                            margin: 8px;
                         }
                         QPushButton:hover {
                            background-color: #9455f4;
@@ -230,7 +235,7 @@ class AddCargoDialog(QDialog):
     def __init__(self, customer_management, priority_queue):
         super().__init__()
         self.setWindowTitle("Kargo Ekle")
-        self.setGeometry(150, 150, 400, 300)
+        self.setGeometry(150, 150, 400, 400)
         self.customer_management = customer_management
         self.priority_queue = priority_queue
 
@@ -252,23 +257,77 @@ class AddCargoDialog(QDialog):
         self.delivery_time_input.setPlaceholderText("Teslimat Süresi (gün)")
         layout.addWidget(self.delivery_time_input)
 
+        # Nereden ve Nereye için ComboBox
+        self.from_city_input = QComboBox(self)
+        self.from_city_input.addItems(self.get_city_list())
+        self.from_city_input.setPlaceholderText("Nereden")
+        layout.addWidget(self.from_city_input)
+
+        self.to_city_input = QComboBox(self)
+        self.to_city_input.addItems(self.get_city_list())
+        self.to_city_input.setPlaceholderText("Nereye")
+        layout.addWidget(self.to_city_input)
+
         add_button = QPushButton("Ekle", self)
         add_button.clicked.connect(self.add_cargo)
         layout.addWidget(add_button)
 
         self.setLayout(layout)
 
+    def get_city_list(self):
+        return [
+            "İstanbul", "Ankara", "İzmir", "Antalya", "Adana", "Afyon", "Ağrı", "Aksaray", "Amasya",
+            "Artvin", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis",
+            "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır",
+            "Düzce", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep",
+            "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "Kahramanmaraş",
+            "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli",
+            "Kırşehir", "Kilis", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin",
+            "Mersin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya",
+            "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ", "Tokat",
+            "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+        ]
+
     def add_cargo(self):
         customer_id = self.customer_id_input.text()
         cargo_id = self.cargo_id_input.text()
         send_date = self.send_date_input.text()
         delivery_time = int(self.delivery_time_input.text())
+        from_city = self.from_city_input.currentText()
+        to_city = self.to_city_input.currentText()
+
         customer = self.customer_management.get_customer(customer_id)
         if customer:
-            cargo = Cargo(cargo_id, send_date, "Yolda", delivery_time)
+            cargo = Cargo(cargo_id, send_date, "Yolda", delivery_time, from_city, to_city)
             customer.add_cargo(cargo)
             self.priority_queue.add_cargo(cargo)
             self.accept()
+
+
+class ShowRoutesDialog(QDialog):
+    def __init__(self, customer_management):
+        super().__init__()
+        self.setWindowTitle("Teslimat Rotaları")
+        self.setGeometry(150, 150, 600, 400)
+        self.customer_management = customer_management
+
+        layout = QVBoxLayout()
+
+        self.tree_widget = QTreeWidget(self)
+        self.tree_widget.setHeaderLabels(["Kargo ID", "Nereden", "Nereye"])
+        layout.addWidget(self.tree_widget)
+
+        self.populate_tree()
+
+        self.setLayout(layout)
+
+    def populate_tree(self):
+        self.tree_widget.clear()
+        for customer in self.customer_management.customers.values():
+            for cargo in customer.cargo_history:
+                root_item = QTreeWidgetItem([cargo.cargo_id, cargo.from_city, cargo.to_city])
+                self.tree_widget.addTopLevelItem(root_item)
+
 
 
 class SearchCargoDialog(QDialog):
@@ -389,19 +448,26 @@ class ShowRoutesDialog(QDialog):
         self.tree_widget = QTreeWidget(self)
         self.tree_widget.setHeaderLabels(["Şehir Adı", "Şehir ID"])
         layout.addWidget(self.tree_widget)
-
         self.populate_tree()
-
         self.setLayout(layout)
-
     def populate_tree(self):
         root_item = QTreeWidgetItem(["Merkez", "0"])
         self.tree_widget.addTopLevelItem(root_item)
         # Örnek veri eklenebilir:
         child_item = QTreeWidgetItem(["İstanbul", "1"])
         root_item.addChild(child_item)
-
-
+        child_item = QTreeWidgetItem(["Elazığ", "2"])
+        root_item.addChild(child_item)
+        child_item = QTreeWidgetItem(["Çanakkale", "3"])
+        root_item.addChild(child_item)
+        child_item = QTreeWidgetItem(["Isparta", "4"])
+        root_item.addChild(child_item)
+        child_item = QTreeWidgetItem(["Afyon", "5"])
+        root_item.addChild(child_item)
+        child_item = QTreeWidgetItem(["Ankara", "6"])
+        root_item.addChild(child_item)
+        child_item = QTreeWidgetItem(["Bursa", "7"])
+        root_item.addChild(child_item)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
