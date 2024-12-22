@@ -1,3 +1,4 @@
+import os
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QLineEdit, QLabel, QTableWidget, QTableWidgetItem, QWidget, QTreeWidget, QTreeWidgetItem
 from PySide6.QtWidgets import QListWidget,QComboBox
@@ -6,6 +7,7 @@ from PySide6.QtCore import Qt
 # Backend modüllerini import ediyoruz
 from customer_management import CustomerManagement, Cargo
 from cargo_prioritization import PriorityQueue
+
 
 
 class MainWindow(QMainWindow):
@@ -20,19 +22,25 @@ class MainWindow(QMainWindow):
 
         # Ana layout
         layout = QVBoxLayout()
-
-        # Arka Plan Resmi
+        # arka plan resmi
+        image_path = os.path.join(os.path.dirname(__file__), "", "kargo.png")
+        pixmap = QPixmap(image_path)
+        print("Resim yolu:", image_path)
         self.background_label = QLabel(self)
-        pixmap = QPixmap(r"C:\Users\Emir Başak Sunar\Documents\GitHub\cargo_management\windowframe\kargo.png")
         self.background_label.setPixmap(pixmap)
         self.background_label.setGeometry(0, 0, self.width(), self.height())  # Resmin boyutlarını pencereye göre ayarla
         self.background_label.setAlignment(Qt.AlignCenter)
         self.background_label.setScaledContents(True)
-
+#C:\Users\Emir Başak Sunar\Documents\GitHub\cargo_management\windowframe\kargo.png
         # Ana Widget (tüm içerik)
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(layout)
+
+        def resizeEvent(self, event):
+            # Pencere boyutları değiştiğinde resmin boyutlarını ayarlıyoruz
+            self.background_label.setGeometry(0, 0, self.width(), self.height())
+            super().resizeEvent(event)
 
         # Başlık
         title_label = QLabel("Kargo Yönetim Sistemi")
