@@ -371,8 +371,10 @@ class SearchCargoDialog(QDialog):
         if customer:
             cargo = customer.search_delivered_cargo(cargo_id)
             if cargo:
-                # Kargo bulunursa, bilgileri uygun formatta göster
-                cargo_info = f"Kargo ID: {cargo.cargo_id}, Durum: {cargo.delivery_status}, Teslim Süresi: {cargo.delivery_time} gün"
+                cargo_info = (
+                    f"Kargo ID: {cargo.cargo_id}, Durum: {cargo.delivery_status}, "
+                    f"Süre: {cargo.delivery_time} gün, Nereden: {cargo.source}, Nereye: {cargo.destination}"
+                )
                 self.result_label.setText(cargo_info)
             else:
                 self.result_label.setText("Kargo bulunamadı.")
