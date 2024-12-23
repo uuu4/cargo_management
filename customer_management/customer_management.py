@@ -25,19 +25,34 @@ class LinkedList:
     def __init__(self):
         self.head = None
 
+    def quick_sort(self, cargos):
+        if len(cargos) <= 1:
+            return cargos
+        pivot = cargos[len(cargos) // 2]
+        left = [cargo for cargo in cargos if cargo.delivery_time < pivot.delivery_time]
+        middle = [cargo for cargo in cargos if cargo.delivery_time == pivot.delivery_time]
+        right = [cargo for cargo in cargos if cargo.delivery_time > pivot.delivery_time]
+        return self.quick_sort(left) + middle + self.quick_sort(right)
+
     def add_sorted(self, cargo):
+        # Convert the linked list to a list for sorting
+        cargos = self.to_list()
+
+        # Add the new cargo
+        cargos.append(cargo)
+
+        # Sort the list based on delivery_time using Quick Sort
+        sorted_cargos = self.quick_sort(cargos)
+
+        # Rebuild the linked list from the sorted cargos
+        self.head = None
+        for cargo in sorted_cargos[::-1]:
+            self.add_to_head(cargo)
+
+    def add_to_head(self, cargo):
         new_node = LinkedListNode(cargo)
-        if not self.head or self.head.cargo.send_date > cargo.send_date:
-            # Yeni düğüm başa eklenir.
-            new_node.next = self.head
-            self.head = new_node
-        else:
-            # Uygun yere ekleme
-            current = self.head
-            while current.next and current.next.cargo.send_date <= cargo.send_date:
-                current = current.next
-            new_node.next = current.next
-            current.next = new_node
+        new_node.next = self.head
+        self.head = new_node
 
     def __iter__(self):
         current = self.head
@@ -56,7 +71,6 @@ class LinkedList:
 
     def to_list(self):
         return [cargo for cargo in self]
-
 
 
 class Customer:

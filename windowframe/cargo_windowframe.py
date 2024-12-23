@@ -25,7 +25,6 @@ class MainWindow(QMainWindow):
         # arka plan resmi
         image_path = os.path.join(os.path.dirname(__file__), "", "kargo.png")
         pixmap = QPixmap(image_path)
-        print("Resim yolu:", image_path)
         self.background_label = QLabel(self)
         self.background_label.setPixmap(pixmap)
         self.background_label.setGeometry(0, 0, self.width(), self.height())  # Resmin boyutlarını pencereye göre ayarla
@@ -179,7 +178,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def open_show_routes_dialog(self):
-        dialog = ShowRoutesDialog()
+        dialog = ShowRoutesDialog(self.customer_management, self.priority_queue)
         dialog.exec()
 
 
@@ -293,16 +292,17 @@ class AddCargoDialog(QDialog):
 
 
 class ShowRoutesDialog(QDialog):
-    def __init__(self, customer_management):
+    def __init__(self, customer_management, priority_queue):
         super().__init__()
         self.setWindowTitle("Teslimat Rotaları")
         self.setGeometry(150, 150, 600, 400)
         self.customer_management = customer_management
+        self.priority_queue = priority_queue
 
         layout = QVBoxLayout()
 
         self.tree_widget = QTreeWidget(self)
-        self.tree_widget.setHeaderLabels(["Kargo ID", "Nereden", "Nereye"])
+        self.tree_widget.setHeaderLabels(["Kargo ID", "Nereden", "Nereye", "Teslimat Süresi"])
         layout.addWidget(self.tree_widget)
 
         self.populate_tree()
@@ -311,10 +311,16 @@ class ShowRoutesDialog(QDialog):
 
     def populate_tree(self):
         self.tree_widget.clear()
+        # Tüm müşteriler ve kargolar için rotaları ekle
         for customer in self.customer_management.customers.values():
-            for cargo in customer.cargo_history:
-                root_item = QTreeWidgetItem([cargo.cargo_id, cargo.from_city, cargo.to_city])
-                self.tree_widget.addTopLevelItem(root_item)
+            for cargo in customer.cargo_history.to_list():  # LinkedList'ten listeye dönüştür
+                cargo_info = QTreeWidgetItem([
+                    cargo.cargo_id,
+                    cargo.source,
+                    cargo.destination,
+                    str(cargo.delivery_time)
+                ])
+                self.tree_widget.addTopLevelItem(cargo_info)
 
 
 
@@ -427,37 +433,7 @@ class ListAllCargosDialog(QDialog):
                 self.table.setItem(row_position, 2, QTableWidgetItem(cargo.delivery_status))
 
 
-class ShowRoutesDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Teslimat Rotaları")
-        self.setGeometry(150, 150, 600, 400)
 
-        layout = QVBoxLayout()
-
-        self.tree_widget = QTreeWidget(self)
-        self.tree_widget.setHeaderLabels(["Şehir Adı", "Şehir ID"])
-        layout.addWidget(self.tree_widget)
-        self.populate_tree()
-        self.setLayout(layout)
-    def populate_tree(self):
-        root_item = QTreeWidgetItem(["Merkez", "0"])
-        self.tree_widget.addTopLevelItem(root_item)
-        # Örnek veri eklenebilir:
-        child_item = QTreeWidgetItem(["İstanbul", "1"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Elazığ", "2"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Çanakkale", "3"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Isparta", "4"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Afyon", "5"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Ankara", "6"])
-        root_item.addChild(child_item)
-        child_item = QTreeWidgetItem(["Bursa", "7"])
-        root_item.addChild(child_item)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
