@@ -10,6 +10,10 @@ class Cargo:
     def __repr__(self):
         return f"ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün, Nereden: {self.source}, Nereye: {self.destination}"
 
+    def __lt__(self, other):
+        # Assuming the priority is based on the `id`
+        return self.cargo_id < other.cargo_id
+
 
 class LinkedListNode:
     def __init__(self, cargo):
