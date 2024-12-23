@@ -92,26 +92,6 @@ class MainWindow(QMainWindow):
                             """)
         layout.addWidget(add_cargo_btn)
 
-        search_cargo_btn = QPushButton("Kargo Durumu Sorgula", self)
-        search_cargo_btn.clicked.connect(self.open_search_cargo_dialog)
-        search_cargo_btn.setFont(QFont("Arial", 14))
-        search_cargo_btn.setStyleSheet("""
-                                        QPushButton {
-                                            background-color: #gray;
-                                                            color: #FFFFFF;
-                                                            border: 2px solid #9455f4;
-                                                            border-radius: 10px;
-                                                            padding: 10px;
-                                                            margin: 8px;
-                                        }
-                                        QPushButton:hover {
-                                             background-color: #9455f4;
-                                        }
-                                        QPushButton:pressed {
-                                            background-color: #444444;
-                                        }
-                                    """)
-        layout.addWidget(search_cargo_btn)
 
         view_history_btn = QPushButton("Gönderim Geçmişini Görüntüle", self)
         view_history_btn.clicked.connect(self.open_view_history_dialog)
@@ -372,7 +352,7 @@ class SearchCargoDialog(QDialog):
             cargo = customer.search_delivered_cargo(cargo_id)
             if cargo:
                 cargo_info = (
-                    f"Kargo ID: {cargo.cargo_id}, Durum: {cargo.delivery_status}, "
+                    f"Kargo ID: {cargo.cargo_id}"
                     f"Süre: {cargo.delivery_time} gün, Nereden: {cargo.source}, Nereye: {cargo.destination}"
                 )
                 self.result_label.setText(cargo_info)
@@ -412,7 +392,7 @@ class ViewHistoryDialog(QDialog):
         if customer:
             # Her bir gönderimi bir liste öğesi olarak ekleyelim
             for cargo in customer.cargo_history:
-                cargo_info = f"Kargo ID: {cargo.cargo_id}, Durum: {cargo.delivery_status}, Tarih: {cargo.send_date}, Süre: {cargo.delivery_time} gün"
+                cargo_info = f"Kargo ID: {cargo.cargo_id}, Tarih: {cargo.send_date}, Süre: {cargo.delivery_time} gün"
                 self.history_list.addItem(cargo_info)
         else:
             self.history_list.addItem("Müşteri bulunamadı.")
@@ -429,7 +409,7 @@ class ListAllCargosDialog(QDialog):
         layout = QVBoxLayout()
         self.table = QTableWidget(self)
         self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Müşteri ID", "Kargo ID", "Durum"])
+        self.table.setHorizontalHeaderLabels(["Müşteri ID", "Kargo ID"])
         layout.addWidget(self.table)
 
         self.populate_table()

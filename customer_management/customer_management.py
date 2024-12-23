@@ -80,7 +80,7 @@ class Customer:
         # Teslim edilen kargolar arasında ara
         current = self.cargo_history.head
         while current:
-            if current.cargo.cargo_id == cargo_id and current.cargo.delivery_status == "Teslim Edildi":
+            if current.cargo.cargo_id == cargo_id:
                 return current.cargo
             current = current.next
         return None
@@ -155,11 +155,10 @@ def main():
             if customer:
                 cargo_id = input("Kargo ID'sini girin: ")
                 send_date = input("Gönderi Tarihi (YYYY-MM-DD): ")
-                delivery_status = input("Teslim Durumu (Teslim Edildi/Teslim Edilmedi): ")
                 delivery_time = int(input("Teslim Süresi (gün): "))
                 source = input("Nereden (Şehir): ")
                 destination = input("Nereye (Şehir): ")
-                new_cargo = Cargo(cargo_id, send_date, delivery_status, delivery_time, source, destination)
+                new_cargo = Cargo(cargo_id, send_date, delivery_time, source, destination)
                 customer.add_cargo(new_cargo)
                 print("Kargo gönderimi başarıyla eklendi.")
             else:

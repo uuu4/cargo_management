@@ -3,16 +3,15 @@ import json
 
 # Cargo class
 class Cargo:
-    def __init__(self, cargo_id, delivery_time, status):
+    def __init__(self, cargo_id, delivery_time):
         self.cargo_id = cargo_id
         self.delivery_time = delivery_time
-        self.status = status
 
     def __lt__(self, other):
         return self.delivery_time < other.delivery_time
 
     def __str__(self):
-        return f"KargoID: {self.cargo_id}, Teslimat süresi: {self.delivery_time}, Durum: {self.status}"
+        return f"KargoID: {self.cargo_id}, Teslimat süresi: {self.delivery_time}"
 
 # Priority Queue class
 class PriorityQueue:
@@ -28,14 +27,12 @@ class PriorityQueue:
             print("İşlenecek kargo yok.")
             return None
         next_cargo = heapq.heappop(self.queue)
-        next_cargo.status = "Teslim edildi"
         print(f"İşleniyor: {next_cargo}")
         return next_cargo
 
-    def update_cargo_status(self, cargo_id, new_status):
+    def update_cargo_status(self, cargo_id):
         for cargo in self.queue:
             if cargo.cargo_id == cargo_id:
-                cargo.status = new_status
                 print(f"Güncellendi: {cargo}")
                 return
         print(f"KargoID {cargo_id} kuyrukta bulunamadı.")
@@ -97,7 +94,6 @@ if __name__ == "__main__":
     pq.process_next_cargo()
 
     # Update cargo status
-    pq.update_cargo_status("C2", "Kargo teslimata çıktı")
 
     # Search for a cargo
     pq.search_cargo("C3")
