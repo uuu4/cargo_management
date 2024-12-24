@@ -1,36 +1,103 @@
 class Cargo:
-    def __init__(self, cargo_id, send_date, delivery_status, delivery_time):
-        self.cargo_id = cargo_id  # Gönderi ID
-        self.send_date = send_date  # Gönderi Tarihi
-        self.delivery_status = delivery_status  # Teslim Durumu ("Teslim Edildi", "Teslim Edilmedi")
-        self.delivery_time = delivery_time  # Teslim Süresi (gün)
+    def __init__(self, cargo_id, send_date, delivery_status, delivery_time, source, destination):
+        self.cargo_id = cargo_id
+        self.send_date = send_date
+        self.delivery_status = delivery_status
+        self.delivery_time = delivery_time
+        self.source = source
+        self.destination = destination
 
     def __repr__(self):
-        return f"[ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün]"
+        return f"ID: {self.cargo_id}, Tarih: {self.send_date}, Durum: {self.delivery_status}, Süre: {self.delivery_time} gün, Nereden: {self.source}, Nereye: {self.destination}"
+
+    def __lt__(self, other):
+        # Assuming the priority is based on the `id`
+        return self.cargo_id < other.cargo_id
+
+
+class LinkedListNode:
+    def __init__(self, cargo):
+        self.cargo = cargo
+        self.next = None
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def quick_sort(self, cargos):
+        if len(cargos) <= 1:
+            return cargos
+        pivot = cargos[len(cargos) // 2]
+        left = [cargo for cargo in cargos if cargo.delivery_time < pivot.delivery_time]
+        middle = [cargo for cargo in cargos if cargo.delivery_time == pivot.delivery_time]
+        right = [cargo for cargo in cargos if cargo.delivery_time > pivot.delivery_time]
+        return self.quick_sort(left) + middle + self.quick_sort(right)
+
+    def add_sorted(self, cargo):
+        # Convert the linked list to a list for sorting
+        cargos = self.to_list()
+
+        # Add the new cargo
+        cargos.append(cargo)
+
+        # Sort the list based on delivery_time using Quick Sort
+        sorted_cargos = self.quick_sort(cargos)
+
+        # Rebuild the linked list from the sorted cargos
+        self.head = None
+        for cargo in sorted_cargos[::-1]:
+            self.add_to_head(cargo)
+
+    def add_to_head(self, cargo):
+        new_node = LinkedListNode(cargo)
+        new_node.next = self.head
+        self.head = new_node
+
+    def __iter__(self):
+        current = self.head
+        while current:
+            yield current.cargo
+            current = current.next
+
+    def display(self):
+        return "\n".join([str(cargo) for cargo in self])
+
+    def search(self, cargo_id):
+        for cargo in self:
+            if cargo.cargo_id == cargo_id:
+                return cargo
+        return None
+
+    def to_list(self):
+        return [cargo for cargo in self]
+
 
 class Customer:
     def __init__(self, customer_id, first_name, last_name):
-        self.customer_id = customer_id  # Müşteri ID
-        self.first_name = first_name  # İsim
-        self.last_name = last_name  # Soyisim
-        self.cargo_history = []  # Gönderim Geçmişi (Liste olarak)
-        self.cargo_stack = []  # Yığın (Stack) için liste
+        self.customer_id = customer_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.cargo_history = LinkedList()  # Gönderim geçmişi LinkedList olarak tutulur.
+        self.cargo_stack = []  # Yığın (Stack) yapısı son 5 gönderimi tutar.
 
     def add_cargo(self, cargo):
-        self.cargo_history.append(cargo)
-        self.cargo_history = self.sort_by_date(self.cargo_history)  # Tarih sırasına göre sıralama
+        # Bağlı listeye kargo ekleme
+        self.cargo_history.add_sorted(cargo)
 
-        # Yeni gönderimi yığına ekle (son 5 gönderim tutulur)
+        # Yığına son gönderimi ekleme
         self.cargo_stack.append(cargo)
         if len(self.cargo_stack) > 5:
             self.cargo_stack.pop(0)
 
-    def sort_by_date(self, cargos):
-        for i in range(len(cargos)):
-            for j in range(0, len(cargos) - i - 1):
-                if cargos[j].send_date > cargos[j + 1].send_date:
-                    cargos[j], cargos[j + 1] = cargos[j + 1], cargos[j]
-        return cargos
+    def search_delivered_cargo(self, cargo_id):
+        # Teslim edilen kargolar arasında ara
+        current = self.cargo_history.head
+        while current:
+            if current.cargo.cargo_id == cargo_id:
+                return current.cargo
+            current = current.next
+        return None
 
     def display_last_5_cargos(self):
         if not self.cargo_stack:
@@ -40,52 +107,18 @@ class Customer:
             for cargo in reversed(self.cargo_stack):
                 print(cargo)
 
-    def search_delivered_cargo(self, cargo_id):
-        delivered_cargos = [cargo for cargo in self.cargo_history if cargo.delivery_status == "Teslim Edildi"]
-        delivered_cargos = self.sort_by_id(delivered_cargos)  # Kargo ID'ye göre sıralama
-
-        # Binary Search
-        left, right = 0, len(delivered_cargos) - 1
-        while left <= right:
-            mid = (left + right) // 2
-            if delivered_cargos[mid].cargo_id == cargo_id:
-                return delivered_cargos[mid]
-            elif delivered_cargos[mid].cargo_id < cargo_id:
-                left = mid + 1
-            else:
-                right = mid - 1
-        return None
-
-    def sort_by_id(self, cargos):
-        for i in range(len(cargos)):
-            for j in range(0, len(cargos) - i - 1):
-                if cargos[j].cargo_id > cargos[j + 1].cargo_id:
-                    cargos[j], cargos[j + 1] = cargos[j + 1], cargos[j]
-        return cargos
-
-    def sort_undelivered_cargos(self):
-        undelivered_cargos = [cargo for cargo in self.cargo_history if cargo.delivery_status == "Teslim Edilmedi"]
-
-        def quick_sort(array):
-            if len(array) <= 1:
-                return array
-            pivot = array[0]
-            less = [cargo for cargo in array[1:] if cargo.delivery_time <= pivot.delivery_time]
-            greater = [cargo for cargo in array[1:] if cargo.delivery_time > pivot.delivery_time]
-            return quick_sort(less) + [pivot] + quick_sort(greater)
-
-        return quick_sort(undelivered_cargos)
+    def search_cargo(self, cargo_id):
+        return self.cargo_history.search(cargo_id)
 
     def display_cargo_history(self):
-        if not self.cargo_history:
-            print("Bu müşteri için gönderim geçmişi bulunmamaktadır.")
-        else:
-            print(f"{self.first_name} {self.last_name} için gönderim geçmişi:")
-            for cargo in self.cargo_history:
-                print(cargo)
+        history = self.cargo_history.display()
+        if not history:
+            return "Bu müşteri için gönderim geçmişi bulunmamaktadır."
+        return history
 
     def __repr__(self):
         return f"[ID: {self.customer_id}, Ad: {self.first_name}, Soyad: {self.last_name}]"
+
 
 class CustomerManagement:
     def __init__(self):
@@ -104,11 +137,12 @@ class CustomerManagement:
 
     def display_all_customers(self):
         if not self.customers:
-            print("Henüz müşteri eklenmedi.")
-        else:
-            print("Tüm Müşteriler:")
-            for customer in self.customers.values():
-                print(customer)
+            return "Henüz müşteri eklenmedi."
+        return "\n".join([str(customer) for customer in self.customers.values()])
+
+    def __repr__(self):
+        return f"Müşteri Sayısı: {len(self.customers)}"
+
 
 # Test ve Konsol Menüsü
 def main():
@@ -119,10 +153,8 @@ def main():
         print("2. Müşteri bilgisi al ve kargo gönderimi ekle")
         print("3. Müşteri gönderim geçmişini görüntüle")
         print("4. Müşteri son 5 gönderimi görüntüle")
-        print("5. Teslim edilmiş kargoyu ID ile ara")
-        print("6. Teslim edilmemiş kargoları sırala")
-        print("7. Tüm müşterileri görüntüle")
-        print("8. Çıkış")
+        print("5. Tüm müşterileri görüntüle")
+        print("6. Çıkış")
         choice = int(input("Seçiminizi yapın: "))
 
         if choice == 1:
@@ -137,9 +169,10 @@ def main():
             if customer:
                 cargo_id = input("Kargo ID'sini girin: ")
                 send_date = input("Gönderi Tarihi (YYYY-MM-DD): ")
-                delivery_status = input("Teslim Durumu (Teslim Edildi/Teslim Edilmedi): ")
                 delivery_time = int(input("Teslim Süresi (gün): "))
-                new_cargo = Cargo(cargo_id, send_date, delivery_status, delivery_time)
+                source = input("Nereden (Şehir): ")
+                destination = input("Nereye (Şehir): ")
+                new_cargo = Cargo(cargo_id, send_date, delivery_time, source, destination)
                 customer.add_cargo(new_cargo)
                 print("Kargo gönderimi başarıyla eklendi.")
             else:
@@ -149,7 +182,7 @@ def main():
             customer_id = input("Müşteri ID'sini girin: ")
             customer = cm.get_customer(customer_id)
             if customer:
-                customer.display_cargo_history()
+                print(customer.display_cargo_history())
             else:
                 print("Bu ID'ye sahip bir müşteri bulunamadı.")
 
@@ -162,37 +195,14 @@ def main():
                 print("Bu ID'ye sahip bir müşteri bulunamadı.")
 
         elif choice == 5:
-            customer_id = input("Müşteri ID'sini girin: ")
-            customer = cm.get_customer(customer_id)
-            if customer:
-                cargo_id = input("Aramak istediğiniz Kargo ID'sini girin: ")
-                result = customer.search_delivered_cargo(cargo_id)
-                if result:
-                    print("Bulunan Kargo:", result)
-                else:
-                    print("Teslim edilmiş bu ID'ye sahip kargo bulunamadı.")
-            else:
-                print("Bu ID'ye sahip bir müşteri bulunamadı.")
+            print(cm.display_all_customers())
 
         elif choice == 6:
-            customer_id = input("Müşteri ID'sini girin: ")
-            customer = cm.get_customer(customer_id)
-            if customer:
-                sorted_cargos = customer.sort_undelivered_cargos()
-                print("Sıralanmış Teslim Edilmemiş Kargolar:")
-                for cargo in sorted_cargos:
-                    print(cargo)
-            else:
-                print("Bu ID'ye sahip bir müşteri bulunamadı.")
-
-        elif choice == 7:
-            cm.display_all_customers()
-
-        elif choice == 8:
             break
 
         else:
             print("Geçersiz seçim. Tekrar deneyin.")
+
 
 if __name__ == "__main__":
     main()
