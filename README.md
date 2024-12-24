@@ -7,7 +7,14 @@ Serpil ÜSTEBAY
 ### Projeye Katkıda Bulunanlar:  
 - **Ali Emre Aydın** (23120205056)  
 - **Emir Başak Sunar** (23120205053)  
-- **Saruhan Görkem Türköz** (23120205062)  
+- **Saruhan Görkem Türköz** (23120205062)
+
+
+**NOT: Bu projede Pyside kütüphanesi kullanılmıştır. Kullanmaya başlamadan önce pyside kurmanız gerekmektedir, bunun için terminale:
+pip install PySide6
+yazmanız gerekmektedir. Sorun yaşıyorsanız aşağıdaki bağlantıyı ziyaret edin:
+https://pyside.readthedocs.io/en/latest/installing/windows.html**
+
 
 
 
