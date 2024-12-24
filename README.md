@@ -1,7 +1,7 @@
 # KARGO YÖNETİM SİSTEMİ  
 **Raporlama ve Performans Analizi**  
 
-### Hazırlayan:  
+### Ders Yetkilisi:  
 Serpil ÜSTEBAY  
 
 ### Projeye Katkıda Bulunanlar:  
