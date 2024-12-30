@@ -1,4 +1,4 @@
-# KARGO YÖNETİM SİSTEMİ  
+# İMÜ DSA KARGO YÖNETİM SİSTEMİ  
 **Raporlama ve Performans Analizi**  
 
 ### Ders Yetkilisi:  
